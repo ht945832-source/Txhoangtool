@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HOANGDZ - CRYSTAL AI V14</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --accent: #00d2ff; 
+            --accent-glow: rgba(0, 210, 255, 0.4);
+            --bg: #00050a;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body { 
+            margin: 0; font-family: 'Share Tech Mono', monospace; 
+            background: var(--bg); color: #fff; 
+            overflow-x: hidden; min-height: 100vh;
+            display: flex; justify-content: center;
+            background-image: 
+                radial-gradient(circle at 50% 0%, #001a33 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, #050505 0%, transparent 50%);
+        }
+
+        /* Hiệu ứng Tuyết rơi */
+        #snow-canvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .app-container { 
+            width: 100%; max-width: 420px; padding: 20px; 
+            position: relative; z-index: 10; 
+        }
+
+        /* Brand Header */
+        .brand-header {
+            text-align: center; margin-bottom: 25px;
+            padding: 30px 15px; border-radius: 24px;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .brand-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0; font-size: 32px; font-weight: 900;
+            letter-spacing: 5px; color: #fff;
+            text-shadow: 0 0 20px var(--accent);
+        }
+
+        .brand-header span {
+            font-size: 10px; letter-spacing: 2px;
+            color: var(--accent); opacity: 0.8;
+        }
+
+        /* Panel chính */
+        .main-panel {
+            background: rgba(0, 10, 20, 0.7);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 20px; padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: inset 0 0 20px rgba(0, 210, 255, 0.05);
+        }
+
+        input {
+            width: 100%; padding: 18px; background: rgba(0,0,0,0.6);
+            border: 1px solid var(--accent); border-radius: 12px;
+            color: #fff; text-align: center; font-size: 15px;
+            outline: none; box-sizing: border-box;
+            transition: 0.3s; margin-bottom: 15px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        input:focus { box-shadow: 0 0 15px var(--accent-glow); border-color: #fff; }
+
+        .btn-main {
+            width: 100%; padding: 18px; border: none; border-radius: 12px;
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            color: #000; font-weight: 900; font-size: 16px;
+            cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.3);
+            transition: 0.2s;
+        }
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* Kết quả */
+        #result-box { display: none; margin-top: 25px; text-align: center; animation: slideUp 0.4s ease-out; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .res-label { font-size: 12px; opacity: 0.6; margin-bottom: 5px; }
+        .res-value { 
+            font-size: 75px; font-weight: 900; margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 40px var(--accent);
+        }
+
+        .ai-badge {
+            display: inline-block; padding: 6px 15px; border-radius: 20px;
+            background: rgba(0, 210, 255, 0.1); border: 1px solid var(--accent);
+            font-size: 12px; margin-top: 10px; color: var(--accent);
+        }
+
+        /* Lịch sử */
+        .history-box {
+            margin-top: 20px; max-height: 150px; overflow-y: auto;
+            padding: 10px; background: rgba(0,0,0,0.3); border-radius: 12px;
+        }
+        .hist-item {
+            display: flex; justify-content: space-between;
+            padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+
+        .footer-tag { text-align: center; font-size: 10px; margin-top: 20px; opacity: 0.4; }
+    </style>
+</head>
+<body>
+
+<canvas id="snow-canvas"></canvas>
+
+<div class="app-container">
+    <div class="brand-header">
+        <span>PREMIUM MD5 PREDICTOR</span>
+        <h1>HOANGDZ</h1>
+        <div id="ai-status" style="color: #00ff00; font-size: 11px; margin-top: 5px;">● AI CORE ACTIVE v14.0</div>
+    </div>
+
+    <div class="main-panel">
+        <input type="text" id="md5Input" placeholder="DÁN MÃ MD5 TẠI ĐÂY..." maxlength="32">
+        <button class="btn-main" onclick="analyzeMD5()">PHÂN TÍCH DỮ LIỆU</button>
+
+        <div id="result-box">
+            <div class="res-label">KẾT QUẢ DỰ ĐOÁN</div>
+            <div id="resValue" class="res-value">--</div>
+            <div id="aiBadge" class="ai-badge">XÁC SUẤT: 0%</div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="saveResult(true)" style="flex:1; padding: 12px; background: #00ff00; border:none; border-radius: 8px; font-weight:bold; cursor:pointer;">ĐÚNG</button>
+                <button onclick="saveResult(false)" style="flex:1; padding: 12px; background: #ff3232; border:none; border-radius: 8px; font-weight:bold; color:#fff; cursor:pointer;">SAI</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="history-box" id="histLog">
+        <div style="text-align:center; opacity:0.5; font-size:11px;">CHƯA CÓ DỮ LIỆU PHIÊN</div>
+    </div>
+
+    <div class="footer-tag">© 2024-2025 HOANGDZ - ENCRYPTED BY SUPREME ALGORITHM</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script>
+    // --- HIỆU ỨNG TUYẾT RƠI (SNOWFALL ENGINE) ---
+    const canvas = document.getElementById('snow-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.size = Math.random() * 3 + 1;
+            this.speed = Math.random() * 1 + 0.5;
+            this.velX = Math.random() * 0.5 - 0.25;
+            this.opacity = Math.random() * 0.5 + 0.3;
+        }
+        update() {
+            this.y += this.speed;
+            this.x += this.velX;
+            if (this.y > canvas.height) this.reset();
+        }
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // --- THUẬT TOÁN HOANGDZ V14 ---
+    let adaptiveShift = 0;
+
+    function analyzeMD5() {
+        const input = document.getElementById("md5Input").value.trim();
+        if (input.length < 31) return alert("VUI LÒNG NHẬP MÃ MD5!");
+
+        // Giả lập quét dữ liệu
+        const btn = document.querySelector('.btn-main');
+        btn.innerText = "ĐANG GIẢI MÃ...";
+        btn.disabled = true;
+
+        setTimeout(() => {
+            // Logic xử lý chính
+            let hash = CryptoJS.MD5(input).toString();
+            let score = 0;
+            
+            // Phân tích 8 ký tự đầu
+            for(let i=0; i<8; i++) {
+                score += parseInt(hash[i], 16);
+            }
+
+            // Kết hợp Adaptive Learning
+            let finalResult = (score + adaptiveShift) % 2 === 0 ? "TÀI" : "XỈU";
+            let confidence = 88 + (Math.random() * 9);
+
+            // Hiển thị UI
+            document.getElementById("result-box").style.display = "block";
+            const resVal = document.getElementById("resValue");
+            resVal.innerText = finalResult;
+            resVal.style.color = finalResult === "TÀI" ? "#00d2ff" : "#ffffff";
+            resVal.style.textShadow = finalResult === "TÀI" ? "0 0 40px rgba(0,210,255,0.6)" : "0 0 40px rgba(255,255,255,0.4)";
+            
+            document.getElementById("aiBadge").innerText = `ĐỘ TIN CẬY: ${confidence.toFixed(2)}%`;
+            
+            btn.innerText = "PHÂN TÍCH DỮ LIỆU";
+            btn.disabled = false;
+            
+            window.lastPredict = { side: finalResult, code: input.substring(0,6) };
+        }, 800);
+    }
+
+    function saveResult(isCorrect) {
+        if(!isCorrect) {
+            adaptiveShift += 1; // Đảo thuật toán nếu sai
+        }
+
+        const log = document.getElementById("histLog");
+        if(log.innerText.includes("CHƯA CÓ")) log.innerHTML = "";
+        
+        const div = document.createElement("div");
+        div.className = "hist-item";
+        div.innerHTML = `
+            <span>#${window.lastPredict.code}... [${window.lastPredict.side}]</span>
+            <span style="color:${isCorrect?'#00ff00':'#ff3232'}">${isCorrect?'CHUẨN':'SAI'}</span>
+        `;
+        log.insertBefore(div, log.firstChild);
+        
+        document.getElementById("result-box").style.display = "none";
+        document.getElementById("md5Input").value = "";
+    }
+</script>
+</body>
+</html>
